@@ -21,8 +21,7 @@ class RecordVideo(object):
 
     def call_effects(self):
         if self.effects == "background_removal":
-            import_pic = cv2.imread(self.import_pic_path)
-            return lambda frame: utils.effects.background_removal_effect(frame, import_pic)
+            return lambda frame: utils.effects.background_removal_effect(frame, self.import_pic_path)
         else:
             return lambda frame: utils.effects.do_nothing_effect(frame)
 
@@ -36,14 +35,14 @@ class RecordVideo(object):
         
         effect_func = self.call_effects()
 
-        while (int(time.time() - start_time) < self.time_capture):
+        while (vid.isOpened()):
             ret, frame = vid.read()
 
             if ret:
                 effect_frame = effect_func(frame)
                 save_vid.write(effect_frame)
 
-                cv2.imshow("frame", frame)
+                cv2.imshow("frame", effect_frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:
