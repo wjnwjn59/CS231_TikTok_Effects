@@ -22,7 +22,7 @@ def background_removal_effect(frame, background_img_path):
     return output_img
 
 
-def zoom_in(img,count_frame):
+def zoom_in_effect(img, count_frame, stop_zoom=50, smooth=5):
     '''
     Input (type: np.array): Một frame ảnh.
     Ouput (type: np.array): Một frame ảnh sau khi biến đổi .
