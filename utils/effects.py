@@ -2,12 +2,6 @@ import cv2
 import pixellib
 from pixellib.tune_bg import alter_bg
 
-def do_nothing_effect(frame):
-    """
-    If no effect is specified, then this function will be used because it returns original frame.
-    """
-    return frame
-
 def background_removal_effect(frame, background_img_path):
     """
     Change background with an imported picture
