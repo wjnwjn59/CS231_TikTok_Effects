@@ -33,8 +33,6 @@ def zoom_in_effect(img, count_frame, stop_zoom=50, smooth=5):
     - smooth (type: int): smooth càng lớn thì phần crop ảnh cho mỗi frame càng ít.
                             Giá trị smooth cần điều chỉnh phù hợp với fps đọc được.
     '''
-    stop_zoom = 50
-    smooth = 5
     
     if count_frame >= stop_zoom:
 
