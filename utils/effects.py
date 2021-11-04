@@ -46,7 +46,8 @@ def zoom_in_effect(img, count_frame, stop_zoom=50, smooth=5):
     resized_cropped  = cv2.resize(cropped, (width, height)) 
 
     return resized_cropped
-def effect_sepia(img):
+
+def sepia_effect(img):
     '''
     Input : Numpy Array 
     Ouput : Numpy Array
@@ -59,5 +60,6 @@ def effect_sepia(img):
                                     [0.393, 0.769, 0.189]])) # multipying image with special sepia matrix
     img_sepia[np.where(img_sepia > 255)] = 255 # normalizing values greater than 255 to 255
     img_sepia = np.array(img_sepia, dtype=np.uint8)
+    
     return img_sepia
 
