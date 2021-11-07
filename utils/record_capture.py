@@ -57,6 +57,19 @@ class RecordVideo(object):
                         break
                 else:
                     break
+        
+        elif self.effects == "sepia":
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    effect_frame = utils.effects.sepia_effect(frame)
+                    save_vid.write(effect_frame)
+                    cv2.imshow("frame", effect_frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+        
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
