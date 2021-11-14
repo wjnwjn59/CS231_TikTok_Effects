@@ -1,0 +1,15 @@
+
+.main{
+    text-align: center;
+    background-color: rgb(186, 229, 145);
+}
+
+
+.row{
+    text-align: left;
+}
+
+.button{
+    width: 49%;
+    margin-bottom: 5%;
+}
