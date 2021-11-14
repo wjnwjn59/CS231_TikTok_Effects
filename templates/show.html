@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Show result</title>
+    <link rel="stylesheet" href="/static/show.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous"> 
+
+
+</head>
+<body class="body-" >
+  <div class="main">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img src="https://tuoitre.uit.edu.vn/wp-content/uploads/2015/07/logo-uit.png" alt="" width="40" height="40">
+        </a>
+          
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Trang chủ</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/lavatus/CS114.L21">Github</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="result_pred container-fluid">
+      {% if prediction %}
+      <p class="text-center">{{prediction}}</p>
+      <img class="img" src={{hinhanh}}>
+      <p class="text-center" style="font-size: 30px;">Địa chỉ: {{location}}</p>
+      <p class="description-text">{{para1}}</p>
+      <p class="description-text">{{para2}}</p>
+      {% endif %}
+    </div>
+
+    
+
+
+
+  </div>
+  
+</body>
+</html>
