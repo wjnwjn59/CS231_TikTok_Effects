@@ -88,6 +88,24 @@ class RecordVideo(object):
                         break
                 else:
                     break
+        elif self.effects == "time_warp_scan_vertical":
+            i=0
+            previous_frame_vertical=np.zeros((self.record_screen_shape[1], self.record_screen_shape[0], 3), dtype="uint8")
+            cyan_line_vertical=np.zeros((1,self.record_screen_shape[0], 3), dtype="uint8")
+            cyan_line_vertical[:,:] = (255, 255, 0)
+            while (vid.isOpened() and i < self.record_screen_shape[1]):
+                ret, frame = vid.read()
+                if ret:
+                   previous_frame_vertical[i, :, :] = frame[i, :, :]
+                   effect_frame = np.vstack((previous_frame_vertical[:i,:, :], cyan_line_vertical, frame[i+1:,:, :]))
+                   save_vid.write(effect_frame)
+                   cv2.imshow("frame", effect_frame)
+                   i += 1
+                   if cv2.waitKey(1) & 0xFF == ord('q'):
+                      break
+                else:
+                   break
+                 
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
