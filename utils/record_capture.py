@@ -24,6 +24,7 @@ class RecordVideo(object):
 
     def record_video_capture(self):
         vid = cv2.VideoCapture(0)
+        vid1=cv2.VideoCapture('import_pics/Green Screen_2.mp4')
         if not os.path.isdir(self.record_directory_name):
             os.mkdir(self.record_directory_name)
         video_name = os.path.join(self.record_directory_name, self.record_name)
@@ -70,6 +71,25 @@ class RecordVideo(object):
                     cv2.imshow("frame", effect_frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
+                else:
+                    break
+        
+        elif self.effects == "vintage":
+            while (vid.isOpened()):
+                ret, frame = vid1.read()  
+                ret_1,frame_1=vid.read() 
+                if ret==True:
+                    frame=cv2.resize(frame,(640,480))
+                    hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+                    l_green=np.array([32,94,132])
+                    u_green=np.array([179,255,255])
+                    mask=cv2.inRange(hsv,l_green,u_green)
+                    res=cv2.bitwise_and(frame,frame,mask=mask)
+                    f=frame-res
+                    green_screen=np.where(f==0,frame_1,f)
+                    cv2.imshow('green',green_screen)
+                    if cv2.waitKey(1)&0xFF==ord('q'):
+                          break
                 else:
                     break
         elif self.effects == "time_warp_scan_horizontal":
