@@ -7,13 +7,14 @@ import utils.effects
 
 class RecordVideo(object):
     def __init__(self, 
+                
                 record_directory_name="recorded_videos", 
                 record_name="recorded_video.mp4", 
                 time_capture=10, 
                 import_pic_path="import_pics/dh_cntt.jpg", 
                 import_video_path=None, 
                 effects=None):
-
+        
         self.record_directory_name = record_directory_name
         self.record_name = record_name
         self.time_capture = time_capture
@@ -23,13 +24,18 @@ class RecordVideo(object):
         self.record_screen_shape = (640, 480) # (width, height)
 
     def record_video_capture(self):
+
         vid = cv2.VideoCapture(0)
+
+
+
         vid1=cv2.VideoCapture('import_pics/Green Screen_2.mp4')
+
         if not os.path.isdir(self.record_directory_name):
             os.mkdir(self.record_directory_name)
         video_name = os.path.join(self.record_directory_name, self.record_name)
         save_vid = cv2.VideoWriter(video_name, -1, 20.0, self.record_screen_shape)
-        start_time = time.time()
+        #start_time = time.time()
         
 
         if self.effects == "background_removal":
@@ -43,7 +49,7 @@ class RecordVideo(object):
                     # cv2.imshow("frame", effect_frame)
 
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(effect_frame,1))
+                        ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -54,7 +60,7 @@ class RecordVideo(object):
             frame_count = 0
             stop_zoom = 100
             smooth = 5
-            while (vid.isOpened()):
+            while True:
                 ret, frame = vid.read()
                 if ret:
                     effect_frame = utils.effects.zoom_in_effect(frame, frame_count, stop_zoom, smooth)
@@ -63,27 +69,33 @@ class RecordVideo(object):
 
                     # cv2.imshow("frame", effect_frame)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(effect_frame,1))
+                        ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
                         pass   
+                else:
+                    pass
+    
         
         elif self.effects == "sepia":
-            while (vid.isOpened()):
+            while True:
                 ret, frame = vid.read()
                 if ret:
                     effect_frame = utils.effects.sepia_effect(frame)
                     save_vid.write(effect_frame)
                     # cv2.imshow("frame", effect_frame)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(effect_frame,1))
+                        ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
                         pass   
+                else:
+                    pass
+               
         
         elif self.effects == "vintage":
             while (vid.isOpened()):
@@ -100,12 +112,13 @@ class RecordVideo(object):
                     green_screen=np.where(f==0,frame_1,f)
                     # cv2.imshow('green',green_screen)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(green_screen, 1))
+                        ret, buffer = cv2.imencode('.jpg', green_screen)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
                         pass   
+
         elif self.effects == "time_warp_scan_horizontal":
             i = 0
             previous_frame = np.zeros((self.record_screen_shape[1], self.record_screen_shape[0], 3), dtype="uint8")
@@ -120,12 +133,13 @@ class RecordVideo(object):
                     #cv2.imshow("frame", effect_frame)
                     i += 1
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(effect_frame, 1))
+                        ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
                         pass   
+
         elif self.effects == "time_warp_scan_vertical":
             i=0
             previous_frame_vertical=np.zeros((self.record_screen_shape[1], self.record_screen_shape[0], 3), dtype="uint8")
@@ -136,11 +150,11 @@ class RecordVideo(object):
                 if ret:
                     previous_frame_vertical[i, :, :] = frame[i, :, :]
                     effect_frame = np.vstack((previous_frame_vertical[:i,:, :], cyan_line_vertical, frame[i+1:,:, :]))
-                    save_vid.write(effect_frame)
+                    #save_vid.write(effect_frame)
                     #cv2.imshow("frame", effect_frame)
                     i += 1
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(effect_frame, 1))
+                        ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -173,7 +187,7 @@ class RecordVideo(object):
                     # cv2.imshow("frame", frame)
 
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+                        ret, buffer = cv2.imencode('.jpg',frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -184,11 +198,11 @@ class RecordVideo(object):
                 ret, frame = vid.read()
 
                 if ret:
-                    save_vid.write(frame)
+                    #save_vid.write(frame)
 
                     # cv2.imshow("frame", frame)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
+                        ret, buffer = cv2.imencode('.jpg', frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -197,6 +211,6 @@ class RecordVideo(object):
 
         vid.release()
         save_vid.release()
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
 
 
