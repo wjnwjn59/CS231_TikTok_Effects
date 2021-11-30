@@ -1,5 +1,4 @@
 import cv2
-import time
 import sys
 import os
 import numpy as np
@@ -35,7 +34,7 @@ class RecordVideo(object):
             os.mkdir(self.record_directory_name)
         video_name = os.path.join(self.record_directory_name, self.record_name)
         save_vid = cv2.VideoWriter(video_name, -1, 20.0, self.record_screen_shape)
-        #start_time = time.time()
+        
         
 
         if self.effects == "background_removal":
@@ -46,16 +45,15 @@ class RecordVideo(object):
                     effect_frame = utils.effects.background_removal_effect(frame, self.import_pic_path)
                     save_vid.write(effect_frame)
 
-                    # cv2.imshow("frame", effect_frame)
-
                     try:
-                        ret, buffer = cv2.imencode('.jpg',effect_frame)
+                        ret, buffer = cv2.imencode('.jpg',cv2.flip(effect_frame,1))
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
                         pass   
  
+
         elif self.effects == "zoom_in":
             frame_count = 0
             stop_zoom = 100
@@ -67,8 +65,8 @@ class RecordVideo(object):
                     frame_count += 1
                     save_vid.write(effect_frame)
 
-                    # cv2.imshow("frame", effect_frame)
                     try:
+                        effect_frame= cv2.putText(cv2.flip(effect_frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -85,8 +83,9 @@ class RecordVideo(object):
                 if ret:
                     effect_frame = utils.effects.sepia_effect(frame)
                     save_vid.write(effect_frame)
-                    # cv2.imshow("frame", effect_frame)
+                   
                     try:
+                        effect_frame= cv2.putText(cv2.flip(effect_frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -112,7 +111,7 @@ class RecordVideo(object):
                     green_screen=np.where(f==0,frame_1,f)
                     # cv2.imshow('green',green_screen)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', green_screen)
+                        ret, buffer = cv2.imencode('.jpg', cv2.flip(green_screen,1))
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -130,9 +129,10 @@ class RecordVideo(object):
                     previous_frame[:, i, :] = frame[:, i, :]
                     effect_frame = np.hstack((previous_frame[:, :i, :], cyan_line, frame[:, i+1:, :]))
                     save_vid.write(effect_frame)
-                    #cv2.imshow("frame", effect_frame)
+
                     i += 1
                     try:
+                        effect_frame= cv2.putText(cv2.flip(effect_frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -150,10 +150,11 @@ class RecordVideo(object):
                 if ret:
                     previous_frame_vertical[i, :, :] = frame[i, :, :]
                     effect_frame = np.vstack((previous_frame_vertical[:i,:, :], cyan_line_vertical, frame[i+1:,:, :]))
-                    #save_vid.write(effect_frame)
-                    #cv2.imshow("frame", effect_frame)
+                    save_vid.write(effect_frame)
+                
                     i += 1
                     try:
+                        effect_frame= cv2.putText(cv2.flip(effect_frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -165,7 +166,7 @@ class RecordVideo(object):
             cascPath = os.path.join(cv2_base_dir, 'data/haarcascade_frontalface_default.xml')
             faceCascade = cv2.CascadeClassifier(cascPath)
             while (vid.isOpened()):
-                 # Capture frame-by-frame
+                # Capture frame-by-frame
                 ret, frame = vid.read()
 
                 if ret:
@@ -183,10 +184,9 @@ class RecordVideo(object):
                     for (x, y, w, h) in faces:
                         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                     save_vid.write(frame)
-                    # Display the resulting frame
-                    # cv2.imshow("frame", frame)
-
+                  
                     try:
+                        frame= cv2.putText(cv2.flip(frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -198,11 +198,10 @@ class RecordVideo(object):
                 ret, frame = vid.read()
 
                 if ret:
-                    #save_vid.write(frame)
+                    save_vid.write(frame)
 
-                    # cv2.imshow("frame", frame)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', frame)
+                        ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -211,6 +210,6 @@ class RecordVideo(object):
 
         vid.release()
         save_vid.release()
-        #cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
 
 

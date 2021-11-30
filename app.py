@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, make_response
 import cv2
 import datetime, time
 import os, sys
@@ -7,34 +7,46 @@ from threading import Thread
 from utils import effects
 from utils.record_capture import RecordVideo
 
-global capture,rec_frame, grey, switch, neg, slow_zoom_ef, rec, out 
-capture=0
-grey=0
-sepia_ef=0
-slow_zoom_ef=0
-switch=1
+dict_effect = {
+    "sepia_ef":0,
+    "zoom_in_ef":0,
+    "time_warp_horizontal":0,
+    "time_warp_vertical":0,
+    "face_recognition":0,
+}
+
+convert_name = {
+    "sepia_ef":"Sepia",
+    "zoom_in_ef":"Zoom in",
+    "time_warp_horizontal": "Time warp horizontal",
+    "time_warp_vertical":"Time warp vertical",
+    "face_recognition":"Face recognition",
+}
+
+choose =0
+demo =0
 rec=0
 
-#make shots directory to save pics
-try:
-    os.mkdir('./shots')
-except OSError as error:
-    pass
 
 #instatiate flask app  
 app = Flask(__name__, template_folder='./templates')
 
 
+def change_values_dict(dic,key):
+    keys = list(dic.keys())
+    for i in keys:
+        if i==key:
+            dic[i]=1
+        else:
+            dic[i]=0
+
+def name_effect_choosed(dic):
+    for key,value in dic.items():
+      if value==1:
+          return convert_name[key]
 
 
-# def record(out):
-#     global rec_frame
-#     while(rec):
-#         #time.sleep(0.05)
-#         out.write(rec_frame)
-
-
-def gen_frames():  # generate frame by frame from camera
+def gen_frames():  
     camera = cv2.VideoCapture(0)
     global out, capture,rec_frame
     count_frame = 0
@@ -42,39 +54,35 @@ def gen_frames():  # generate frame by frame from camera
         success, frame = camera.read() 
         count_frame +=1
         if success:
-            
-            if(slow_zoom_ef):
-    
-
-                frame =effects.zoom_in_effect(frame,count_frame,stop_zoom=50, smooth=5)
-
-
-            elif(grey):   
-             
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            elif(sepia_ef):
-         
-                frame=effects.sepia_effect(frame)
-
-            
+            if demo:
+                if dict_effect["sepia_ef"]:
+                    frame=effects.sepia_effect(frame)               
             try:
-                ret, buffer = cv2.imencode('.jpg', frame)
+                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            except Exception as e:
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except:
                 pass         
-        else:
-            pass
-    camera.release()
+   
+def record_frame():
+    name_effect = ""
+    if dict_effect["sepia_ef"]:
+        name_effect = "sepia"
+    elif dict_effect["zoom_in_ef"]:
+        name_effect = "zoom_in"
+    elif dict_effect["time_warp_horizontal"]:
+        name_effect = "time_warp_scan_horizontal"
+    elif dict_effect["time_warp_vertical"]:
+        name_effect = "time_warp_scan_vertical"
+    elif dict_effect["face_recognition"]:
+        name_effect = "face_recognition"
 
-name  = "face_recognition"
-recorder = RecordVideo(effects=name)
+    recorder = RecordVideo(effects=name_effect)
+    return recorder
+
 
     
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -85,51 +93,45 @@ def video_feed():
     if not rec:
         return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
     else:
-        return Response(recorder.record_video_capture(), mimetype='multipart/x-mixed-replace; boundary=frame')
- 
-
-
-
+        return Response(record_frame().record_video_capture(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/requests',methods=['POST','GET'])
 def tasks():
-    global switch,camera
-    if request.method == 'POST':
-        if request.form.get('click') == 'Capture':
-        
-            global capture
-            capture=1
-        elif  request.form.get('grey') == 'Grey':
-            global grey
-            grey=not grey
-        elif  request.form.get('sepia_ef') == 'sepia_effect':
-            global sepia_ef
-            sepia_ef=not sepia_ef
-        elif  request.form.get('zoom_in_ef') == 'zoom_in_effect':
-            global slow_zoom_ef
-            slow_zoom_ef=not slow_zoom_ef
+    global zoom_in_ef, sepia_ef,time_warp_horizontal, time_warp_vertical,face_recognition
+    global rec, demo, choose
 
-        elif  request.form.get('rec') == 'Start/Stop Recording':
-            global rec, out
+    if request.method == 'POST':
+        if  request.form.get('effect') == 'sepia_effect':
+            change_values_dict(dict_effect,"sepia_ef")
+
+        elif  request.form.get('effect') == 'zoom_in_effect':  
+            change_values_dict(dict_effect,"zoom_in_ef")
+
+        elif  request.form.get('effect') == 'time_warp_scan_vertical':   
+            change_values_dict(dict_effect,"time_warp_vertical") 
+
+        elif  request.form.get('effect') == 'time_warp_scan_horizontal':   
+            change_values_dict(dict_effect,"time_warp_horizontal")  
+
+        elif  request.form.get('effect') == 'face_recognition':     
+            change_values_dict(dict_effect,"face_recognition")     
+    
+
+
+        elif  request.form.get('demo') == 'Demo':
+            global demo
+            demo = not demo
+        elif  request.form.get('rec') == 'Rec':
+            global rec
             rec = not rec
-            #if(rec):
-                #now=datetime.datetime.now() 
-                #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-                #out = cv2.VideoWriter('videos/vid_{}.avi'.format(str(now).replace(":",'')), fourcc, 20.0, (640, 480))
-                #Start new thread for recording the video
-                #thread = Thread(target = record, args=[out,])
-                #thread.start()
-                #if(rec==False):
-                #    out.release()
-             
-                 
+            
+      
+ 
     elif request.method=='GET':
-        return render_template('index.html')
-    return render_template('index.html')
+        return render_template("index.html",effedt_choosed = name_effect_choosed(dict_effect))
+    return render_template("index.html",effedt_choosed = name_effect_choosed(dict_effect))
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
     
-#camera.release()
-#cv2.destroyAllWindows()     
