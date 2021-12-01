@@ -13,6 +13,7 @@ dict_effect = {
     "time_warp_horizontal":0,
     "time_warp_vertical":0,
     "face_recognition":0,
+    "vintage_ef":0,
 }
 
 convert_name = {
@@ -21,6 +22,7 @@ convert_name = {
     "time_warp_horizontal": "Time warp horizontal",
     "time_warp_vertical":"Time warp vertical",
     "face_recognition":"Face recognition",
+    "vintage_ef": "Vintage"
 }
 
 choose =0
@@ -77,7 +79,8 @@ def record_frame():
         name_effect = "time_warp_scan_vertical"
     elif dict_effect["face_recognition"]:
         name_effect = "face_recognition"
-
+    elif dict_effect["vintage_ef"]:
+        name_effect = "vintage"
     recorder = RecordVideo(effects=name_effect)
     return recorder
 
@@ -115,7 +118,9 @@ def tasks():
 
         elif  request.form.get('effect') == 'face_recognition':     
             change_values_dict(dict_effect,"face_recognition")     
-    
+
+        elif  request.form.get('effect') == 'vintage_effect':     
+            change_values_dict(dict_effect,"vintage_ef")   
 
 
         elif  request.form.get('demo') == 'Demo':

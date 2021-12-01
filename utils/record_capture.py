@@ -101,17 +101,26 @@ class RecordVideo(object):
                 ret, frame = vid1.read()  
                 ret_1,frame_1=vid.read() 
                 if ret==True:
+                    frame = cv2.flip(frame,1)
+                    frame_1 = cv2.flip(frame_1,1)
+
                     frame=cv2.resize(frame,(640,480))
                     hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
                     l_green=np.array([32,94,132])
                     u_green=np.array([179,255,255])
+                    
                     mask=cv2.inRange(hsv,l_green,u_green)
+
+
                     res=cv2.bitwise_and(frame,frame,mask=mask)
+
                     f = frame-res
+
+                    f = cv2.flip(f,1)
                     green_screen=np.where(f==0,frame_1,f)
                     # cv2.imshow('green',green_screen)
                     try:
-                        ret, buffer = cv2.imencode('.jpg', cv2.flip(green_screen,1))
+                        ret, buffer = cv2.imencode('.jpg',green_screen )
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
