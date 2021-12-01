@@ -1,15 +1,31 @@
 
 .main{
     text-align: center;
-    background-color: rgb(186, 229, 145);
 }
 
 
-.row{
-    text-align: left;
+.header{
+
+    font-size: 350%;
+    color: white;
+ 
 }
 
-.button{
-    width: 49%;
-    margin-bottom: 5%;
+.font-text {
+    font-family: 'Times New Roman';
+}
+
+.button-record{
+    font-weight: bold;
+    width: 70px;
+    height: 70px;
+    font-size: 20px;
+    border: 10px;
+    border-radius: 35px;
+    margin: 18px;
+    outline: none;
+    margin:0 auto;
+    display: block;
+    border: black;
+ 
 }
