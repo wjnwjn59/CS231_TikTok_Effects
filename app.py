@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, make_response
+from flask import Flask, render_template, Response, request, make_response, send_from_directory
 import cv2
 import datetime, time
 import os, sys
@@ -135,6 +135,10 @@ def tasks():
     elif request.method=='GET':
         return render_template("index.html",effedt_choosed = name_effect_choosed(dict_effect))
     return render_template("index.html",effedt_choosed = name_effect_choosed(dict_effect))
+
+@app.route("/static/<path:path>")
+def static_dir(path):
+    return send_from_directory("static", path)
 
 
 if __name__ == '__main__':
