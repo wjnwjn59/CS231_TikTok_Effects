@@ -44,5 +44,5 @@ pip install -r requirements.txt
 * For pixellib library: [link](https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.1/xception_pascalvoc.pb). This model should be placed in models/pixellib_models directory.
 ## Step 3: Run the demo
 ```
-python main.py
+python app.py
 ```
