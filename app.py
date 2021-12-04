@@ -5,7 +5,7 @@ import os, sys
 import numpy as np
 from threading import Thread
 from utils import effects
-from utils.record_capture import RecordVideo
+from utils.web_record import WebRecordVideo
 
 dict_effect = {
     "sepia_ef":0,
@@ -81,7 +81,7 @@ def record_frame():
         name_effect = "face_recognition"
     elif dict_effect["vintage_ef"]:
         name_effect = "vintage"
-    recorder = RecordVideo(effects=name_effect)
+    recorder = WebRecordVideo(effects=name_effect)
     return recorder
 
 
