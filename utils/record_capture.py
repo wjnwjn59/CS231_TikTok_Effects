@@ -1,5 +1,6 @@
 import cv2
 import time
+import cvzone
 import sys
 import os
 import numpy as np
@@ -203,13 +204,33 @@ class RecordVideo(object):
 
                         frame[top_left[1]: top_left[1] + nose_height,
                                     top_left[0]: top_left[0] + nose_width] = final_nose
+                    save_vid.write(frame)
+               
                     cv2.imshow("Frame", frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
                 else:
                     break
+        elif self.effects == "stacked_image":
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    
+                    imgGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    img_blur = cv2.blur(frame, (10,10))
+                    negative = 255 - frame
+                    imgList = [frame,    imgGray,
+                               negative, img_blur ]
 
-        
+                    stackedImg = cvzone.stackImages(imgList, 2, 0.5)
+                    
+                    print(stackedImg.shape)
+                    save_vid.write(stackedImg)
+                    cv2.imshow("Frame", stackedImg)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
