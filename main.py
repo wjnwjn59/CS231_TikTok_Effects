@@ -63,7 +63,7 @@ def main():
     ## "face_recognition"
     ## "pig_nose"
     ## "stacked_image"
-    ## "eye_and_mouse"
+    ## "eye_and_mouth"
     effect_name = args.effect_name
     record_directory_name = args.output_dir
     record_name = args.output_video_name

@@ -251,7 +251,7 @@ class RecordVideo(object):
                 else:
                     break
         
-        elif self.effects == "eye_and_mouse":
+        elif self.effects == "eye_and_mouth":
             left_eye = cv2.imread('static/media/left_eye.png')
             right_eye = cv2.imread('static/media/right_eye.png')
             smoke_animation = cv2.VideoCapture('static/media/smoke_animation.mp4')
