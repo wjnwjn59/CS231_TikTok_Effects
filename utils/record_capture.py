@@ -6,7 +6,9 @@ import os
 import numpy as np
 import utils.effects
 import dlib
+from utils import repair_mask
 from math import hypot
+
 
 class RecordVideo(object):
     def __init__(self, 
@@ -41,6 +43,7 @@ class RecordVideo(object):
 
                 if ret:
                     effect_frame = utils.effects.background_removal_effect(frame, self.import_pic_path)
+
                     save_vid.write(effect_frame)
 
                     cv2.imshow("frame", effect_frame)
@@ -57,6 +60,7 @@ class RecordVideo(object):
                 if ret:
                     effect_frame = utils.effects.zoom_in_effect(frame, frame_count, stop_zoom, smooth)
                     frame_count += 1
+                    effect_frame = cv2.flip(effect_frame, 1)
                     save_vid.write(effect_frame)
 
                     cv2.imshow("frame", effect_frame)
@@ -70,7 +74,10 @@ class RecordVideo(object):
                 ret, frame = vid.read()
                 if ret:
                     effect_frame = utils.effects.sepia_effect(frame)
+                    effect_frame = cv2.flip(effect_frame, 1)
+
                     save_vid.write(effect_frame)
+                    
                     cv2.imshow("frame", effect_frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
@@ -82,6 +89,9 @@ class RecordVideo(object):
                 ret, frame = vid1.read()  
                 ret_1,frame_1=vid.read() 
                 if ret==True:
+                    frame = cv2.flip(frame,1)
+                    frame_1 = cv2.flip(frame_1,1)
+
                     frame=cv2.resize(frame,(640,480))
                     hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
                     l_green=np.array([32,94,132])
@@ -89,7 +99,10 @@ class RecordVideo(object):
                     mask=cv2.inRange(hsv,l_green,u_green)
                     res=cv2.bitwise_and(frame,frame,mask=mask)
                     f=frame-res
+                    f = cv2.flip(f,1)
                     green_screen=np.where(f==0,frame_1,f)
+
+                    save_vid.write(green_screen)
                     cv2.imshow('green',green_screen)
                     if cv2.waitKey(1)&0xFF==ord('q'):
                           break
@@ -103,8 +116,10 @@ class RecordVideo(object):
             while (vid.isOpened() and i < self.record_screen_shape[0]):
                 ret, frame = vid.read()
                 if ret:
+                    frame = cv2.flip(frame,1)
                     previous_frame[:, i, :] = frame[:, i, :]
-                    effect_frame = np.hstack((previous_frame[:, :i, :], cyan_line, frame[:, i+1:, :]))
+                    effect_frame = np.hstack((previous_frame[:, :i, :], cyan_line, frame[:, i+1:, :]))   
+
                     save_vid.write(effect_frame)
                     cv2.imshow("frame", effect_frame)
                     i += 1
@@ -120,15 +135,18 @@ class RecordVideo(object):
             while (vid.isOpened() and i < self.record_screen_shape[1]):
                 ret, frame = vid.read()
                 if ret:
-                   previous_frame_vertical[i, :, :] = frame[i, :, :]
-                   effect_frame = np.vstack((previous_frame_vertical[:i,:, :], cyan_line_vertical, frame[i+1:,:, :]))
-                   save_vid.write(effect_frame)
-                   cv2.imshow("frame", effect_frame)
-                   i += 1
-                   if cv2.waitKey(1) & 0xFF == ord('q'):
-                      break
+                    frame = cv2.flip(frame,1)
+                    previous_frame_vertical[i, :, :] = frame[i, :, :]
+                    effect_frame = np.vstack((previous_frame_vertical[:i,:, :], cyan_line_vertical, frame[i+1:,:, :]))
+
+                    save_vid.write(effect_frame)
+                    cv2.imshow("frame", effect_frame)
+                    i += 1
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
                 else:
                    break
+
         elif self.effects == "face_recognition":
             cv2_base_dir = os.path.dirname(os.path.abspath(cv2.__file__))
             cascPath = os.path.join(cv2_base_dir, 'data/haarcascade_frontalface_default.xml')
@@ -136,10 +154,9 @@ class RecordVideo(object):
             while (vid.isOpened()):
                  # Capture frame-by-frame
                 ret, frame = vid.read()
-
-                if ret:
+                if ret:                 
+                    frame = cv2.flip(frame,1)
                     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
                     faces = faceCascade.detectMultiScale(
                         gray, 
                         scaleFactor=1.05,
@@ -172,6 +189,7 @@ class RecordVideo(object):
             while (vid.isOpened()):
                 ret, frame = vid.read()
                 if ret:
+                    frame = cv2.flip(frame,1)
                     nose_mask.fill(0)
                     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     faces = detector(frame)
@@ -204,6 +222,7 @@ class RecordVideo(object):
 
                         frame[top_left[1]: top_left[1] + nose_height,
                                     top_left[0]: top_left[0] + nose_width] = final_nose
+
                     save_vid.write(frame)
                
                     cv2.imshow("Frame", frame)
@@ -211,11 +230,12 @@ class RecordVideo(object):
                         break
                 else:
                     break
+
         elif self.effects == "stacked_image":
             while (vid.isOpened()):
                 ret, frame = vid.read()
                 if ret:
-                    
+                    frame = cv2.flip(frame,1)
                     imgGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     img_blur = cv2.blur(frame, (10,10))
                     negative = 255 - frame
@@ -224,13 +244,68 @@ class RecordVideo(object):
 
                     stackedImg = cvzone.stackImages(imgList, 2, 0.5)
                     
-                    print(stackedImg.shape)
                     save_vid.write(stackedImg)
                     cv2.imshow("Frame", stackedImg)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
                 else:
                     break
+        
+        elif self.effects == "eye_and_mouse":
+            left_eye = cv2.imread('static/media/left_eye.png')
+            right_eye = cv2.imread('static/media/right_eye.png')
+            smoke_animation = cv2.VideoCapture('static/media/smoke_animation.mp4')
+            smoke_frame_counter = 0
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    _, smoke_frame = smoke_animation.read()
+                    smoke_frame_counter += 1
+                    if smoke_frame_counter == smoke_animation.get(cv2.CAP_PROP_FRAME_COUNT):   
+                        smoke_animation.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        smoke_frame_counter = 0
+
+                    frame = cv2.flip(frame, 1)
+                    
+                    _, face_mesh_results = repair_mask.detectFacialLandmarks(frame, repair_mask.face_mesh_videos)
+                    
+                    if face_mesh_results.multi_face_landmarks:
+                        
+                        _, mouth_status = repair_mask.isOpen(frame, face_mesh_results, 'MOUTH', 
+                                                        threshold=15)
+                        
+                        _, left_eye_status = repair_mask.isOpen(frame, face_mesh_results, 'LEFT EYE', 
+                                                        threshold=4.5)
+                        
+                        _, right_eye_status = repair_mask.isOpen(frame, face_mesh_results, 'RIGHT EYE', 
+                                                            threshold=4.5)
+                        
+                        for face_num, face_landmarks in enumerate(face_mesh_results.multi_face_landmarks):
+                            
+                            if left_eye_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, left_eye, face_landmarks,
+                                                'LEFT EYE', repair_mask.mp_face_mesh.FACEMESH_LEFT_EYE)
+                            
+                            if right_eye_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, right_eye, face_landmarks,
+                                                'RIGHT EYE', repair_mask.mp_face_mesh.FACEMESH_RIGHT_EYE)
+                            
+                            if mouth_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, smoke_frame, face_landmarks, 
+                                                'MOUTH', repair_mask.mp_face_mesh.FACEMESH_LIPS)
+
+                    save_vid.write(frame)
+
+                    cv2.imshow("Frame", frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
