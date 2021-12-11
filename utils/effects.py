@@ -1,5 +1,6 @@
 import cv2
 import numpy as np 
+
 # import pixellib
 # from pixellib.tune_bg import alter_bg
 
@@ -63,5 +64,6 @@ def sepia_effect(img):
     img_sepia = np.array(img_sepia, dtype=np.uint8)
     
     return img_sepia
+
 
 

@@ -64,6 +64,7 @@ def main():
     ## "pig_nose"
     ## "stacked_image"
     ## "eye_and_mouth"
+    ## "thug_life"
     effect_name = args.effect_name
     record_directory_name = args.output_dir
     record_name = args.output_video_name
