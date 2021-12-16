@@ -6,7 +6,7 @@ import os
 import numpy as np
 import utils.effects
 import dlib
-from utils import repair_mask
+# from utils import repair_mask
 from math import hypot
 from PIL import Image
 
@@ -29,7 +29,7 @@ class RecordVideo(object):
 
     def record_video_capture(self):
         vid = cv2.VideoCapture(0)
-        vid1=cv2.VideoCapture('import_pics/Green Screen_2.mp4')
+        vid1=cv2.VideoCapture('import_pics/Green Screen.mp4')
         if not os.path.isdir(self.record_directory_name):
             os.mkdir(self.record_directory_name)
         video_name = os.path.join(self.record_directory_name, self.record_name)
@@ -98,7 +98,7 @@ class RecordVideo(object):
                     u_green=np.array([179,255,255])
                     mask=cv2.inRange(hsv,l_green,u_green)
                     res=cv2.bitwise_and(frame,frame,mask=mask)
-                    f=frame-res
+                    f = frame - res
                     f = cv2.flip(f,1)
                     green_screen=np.where(f==0,frame_1,f)
 
@@ -331,12 +331,41 @@ class RecordVideo(object):
                         break
                 else:
                     break
+
+        elif self.effects == "noel_glasses":
+            maskPath = 'static/media/xmas_glasses_mask.png'
+            harcasPath = 'static/files/haarcascade_frontalface_default.xml'
+            faceCascade = cv2.CascadeClassifier(harcasPath)
+            # mask = cv2.imread(maskPath)
+            # mask = Image.fromarray(mask)
+            mask = Image.open(maskPath)
+
+            
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = faceCascade.detectMultiScale(gray, 2.1)
+                    background = Image.fromarray(frame)
+                    for (x, y, w, h) in faces:
+                        resized_mask = mask.resize((w, h), Image.ANTIALIAS)
+                        offset = (x, y)
+                        background.paste(resized_mask, offset, mask=resized_mask)
+                    background = np.asarray(background)
+
+                    cv2.imshow("Frame", background)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
         
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
 
                 if ret:
+                    frame = cv2.flip(frame,1)
                     save_vid.write(frame)
 
                     cv2.imshow("frame", frame)
