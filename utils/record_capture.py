@@ -308,13 +308,9 @@ class RecordVideo(object):
 
 
         elif self.effects == "thug_life":
-            maskPath = 'static/media/classes_mask.png'
+            maskPath = 'static/media/thug_life_mask.png'
             harcasPath = 'static/files/haarcascade_frontalface_default.xml'
             faceCascade = cv2.CascadeClassifier(harcasPath)
-
-            # mask = cv2.imread(maskPath)
-            # mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
-            # mask = Image.fromarray(mask)
             
             mask = Image.open(maskPath)
 
@@ -336,7 +332,33 @@ class RecordVideo(object):
                         break
                 else:
                     break
-        
+        elif self.effects == "noel_glasses":
+            maskPath = 'static/media/xmas_glasses_mask.png'
+            harcasPath = 'static/files/haarcascade_frontalface_default.xml'
+            faceCascade = cv2.CascadeClassifier(harcasPath)
+            # mask = cv2.imread(maskPath)q
+            # mask = Image.fromarray(mask)
+            mask = Image.open(maskPath)
+
+            
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = faceCascade.detectMultiScale(gray, 2.1)
+                    background = Image.fromarray(frame)
+                    for (x, y, w, h) in faces:
+                        resized_mask = mask.resize((w, h), Image.ANTIALIAS)
+                        offset = (x, y)
+                        background.paste(resized_mask, offset, mask=resized_mask)
+                    background = np.asarray(background)
+
+                    cv2.imshow("Frame", background)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
