@@ -308,11 +308,16 @@ class RecordVideo(object):
 
 
         elif self.effects == "thug_life":
-            maskPath = 'static/media/thug_life_mask.png'
+            maskPath = 'static/media/classes_mask.png'
             harcasPath = 'static/files/haarcascade_frontalface_default.xml'
             faceCascade = cv2.CascadeClassifier(harcasPath)
-            mask = Image.open(maskPath)
+
+            # mask = cv2.imread(maskPath)
+            # mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
+            # mask = Image.fromarray(mask)
             
+            mask = Image.open(maskPath)
+
             while (vid.isOpened()):
                 ret, frame = vid.read()
                 if ret:
