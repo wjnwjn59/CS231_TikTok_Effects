@@ -1,8 +1,14 @@
 import cv2
+import time
+import cvzone
 import sys
 import os
 import numpy as np
 import utils.effects
+import dlib
+from utils import repair_mask
+from math import hypot
+from PIL import Image
 
 class WebRecordVideo(object):
     def __init__(self, 
@@ -26,15 +32,12 @@ class WebRecordVideo(object):
 
         vid = cv2.VideoCapture(0)
 
-
-
         vid1=cv2.VideoCapture('import_pics/Green Screen_2.mp4')
 
         if not os.path.isdir(self.record_directory_name):
             os.mkdir(self.record_directory_name)
         video_name = os.path.join(self.record_directory_name, self.record_name)
         save_vid = cv2.VideoWriter(video_name, -1, 20.0, self.record_screen_shape)
-        
         
 
         if self.effects == "background_removal":
@@ -135,13 +138,14 @@ class WebRecordVideo(object):
             while (vid.isOpened() and i < self.record_screen_shape[0]):
                 ret, frame = vid.read()
                 if ret:
+                    frame = cv2.flip(frame,1)
                     previous_frame[:, i, :] = frame[:, i, :]
                     effect_frame = np.hstack((previous_frame[:, :i, :], cyan_line, frame[:, i+1:, :]))
                     save_vid.write(effect_frame)
 
                     i += 1
                     try:
-                        effect_frame= cv2.putText(cv2.flip(effect_frame,1)," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        effect_frame= cv2.putText(effect_frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
                         ret, buffer = cv2.imencode('.jpg',effect_frame)
                         frame = buffer.tobytes()
                         yield (b'--frame\r\n'
@@ -201,11 +205,272 @@ class WebRecordVideo(object):
                         yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     except Exception as e:
-                        pass   
+                        pass  
+        elif self.effects == "pig_nose":
+            nose_image = cv2.imread("import_pics/pig_nose.png")
+            _, frame = vid.read()
+            rows, cols, _ = frame.shape
+            nose_mask = np.zeros((rows, cols), np.uint8)
+
+            detector = dlib.get_frontal_face_detector()
+            predictor = dlib.shape_predictor("static/files/shape_predictor_68_face_landmarks.dat")
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    nose_mask.fill(0)
+                    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = detector(frame)
+
+                    for face in faces:
+                        landmarks = predictor(gray_frame, face)
+
+                        top_nose = (landmarks.part(29).x, landmarks.part(29).y)
+                        center_nose = (landmarks.part(30).x, landmarks.part(30).y)
+                        left_nose = (landmarks.part(31).x, landmarks.part(31).y)
+                        right_nose = (landmarks.part(35).x, landmarks.part(35).y)
+
+                        nose_width = int(hypot(left_nose[0] - right_nose[0],
+                                        left_nose[1] - right_nose[1]) * 1.7)
+                        nose_height = int(nose_width * 0.77)
+
+                        top_left = (int(center_nose[0] - nose_width / 2),
+                                            int(center_nose[1] - nose_height / 2))
+                        bottom_right = (int(center_nose[0] + nose_width / 2),
+                                    int(center_nose[1] + nose_height / 2))
+
+                        nose_pig = cv2.resize(nose_image, (nose_width, nose_height))
+                        nose_pig_gray = cv2.cvtColor(nose_pig, cv2.COLOR_BGR2GRAY)
+                        _, nose_mask = cv2.threshold(nose_pig_gray, 25, 255, cv2.THRESH_BINARY_INV)
+
+                        nose_area = frame[top_left[1]: top_left[1] + nose_height,
+                                    top_left[0]: top_left[0] + nose_width]
+                        nose_area_no_nose = cv2.bitwise_and(nose_area, nose_area, mask=nose_mask)
+                        final_nose = cv2.add(nose_area_no_nose, nose_pig)
+
+                        frame[top_left[1]: top_left[1] + nose_height,
+                                    top_left[0]: top_left[0] + nose_width] = final_nose
+
+                    save_vid.write(frame)
+               
+                    try:
+                        frame= cv2.putText(frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass
+
+        elif self.effects == "cat_nose":
+            nose_image = cv2.imread("static/media/Raumeo.png")
+            _, frame = vid.read()
+            rows, cols, _ = frame.shape
+            nose_mask = np.zeros((rows, cols), np.uint8)
+
+            detector = dlib.get_frontal_face_detector()
+            predictor = dlib.shape_predictor("static/files/shape_predictor_68_face_landmarks.dat")
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    nose_mask.fill(0)
+                    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = detector(frame)
+
+                    for face in faces:
+                        landmarks = predictor(gray_frame, face)
+
+                        top_nose = (landmarks.part(29).x, landmarks.part(29).y)
+                        center_nose = (landmarks.part(30).x, landmarks.part(30).y)
+                        left_nose = (landmarks.part(31).x, landmarks.part(31).y)
+                        right_nose = (landmarks.part(35).x, landmarks.part(35).y)
+
+                        nose_width = int(hypot(left_nose[0] - right_nose[0],
+                                        left_nose[1] - right_nose[1]) * 5)
+                        nose_height = int(nose_width * 0.6)
+
+                        top_left = (int(center_nose[0] - nose_width / 2),
+                                            int(center_nose[1] - nose_height / 2))
+                        bottom_right = (int(center_nose[0] + nose_width / 2),
+                                    int(center_nose[1] + nose_height / 2))
+
+                        nose_pig = cv2.resize(nose_image, (nose_width, nose_height))
+                        nose_pig_gray = cv2.cvtColor(nose_pig, cv2.COLOR_BGR2GRAY)
+                        _, nose_mask = cv2.threshold(nose_pig_gray, 25, 255, cv2.THRESH_BINARY_INV)
+
+                        nose_area = frame[top_left[1]: top_left[1] + nose_height,
+                                    top_left[0]: top_left[0] + nose_width]
+                        nose_area_no_nose = cv2.bitwise_and(nose_area, nose_area, mask=nose_mask)
+                        final_nose = cv2.add(nose_area_no_nose, nose_pig)
+
+                        frame[top_left[1]: top_left[1] + nose_height,
+                                    top_left[0]: top_left[0] + nose_width] = final_nose
+
+                    save_vid.write(frame)
+               
+                    try:
+                        frame= cv2.putText(frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)                        
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass            
+
+        elif self.effects == "stacked_image":
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    imgGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    img_blur = cv2.blur(frame, (10,10))
+                    negative = 255 - frame
+                    imgList = [frame,    imgGray,
+                               negative, img_blur ]
+
+                    stackedImg = cvzone.stackImages(imgList, 2, 0.5)
+                    
+                    save_vid.write(stackedImg)
+                    try:
+                        stackedImg= cv2.putText(stackedImg," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        ret, buffer = cv2.imencode('.jpg', stackedImg)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass
+        
+        elif self.effects == "eye_and_mouth":
+            left_eye = cv2.imread('static/media/left_eye.png')
+            right_eye = cv2.imread('static/media/right_eye.png')
+            smoke_animation = cv2.VideoCapture('static/media/smoke_animation.mp4')
+            smoke_frame_counter = 0
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    _, smoke_frame = smoke_animation.read()
+                    smoke_frame_counter += 1
+                    if smoke_frame_counter == smoke_animation.get(cv2.CAP_PROP_FRAME_COUNT):   
+                        smoke_animation.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        smoke_frame_counter = 0
+
+                    frame = cv2.flip(frame, 1)
+                    
+                    _, face_mesh_results = repair_mask.detectFacialLandmarks(frame, repair_mask.face_mesh_videos)
+                    
+                    if face_mesh_results.multi_face_landmarks:
+                        
+                        _, mouth_status = repair_mask.isOpen(frame, face_mesh_results, 'MOUTH', 
+                                                        threshold=15)
+                        
+                        _, left_eye_status = repair_mask.isOpen(frame, face_mesh_results, 'LEFT EYE', 
+                                                        threshold=4.5)
+                        
+                        _, right_eye_status = repair_mask.isOpen(frame, face_mesh_results, 'RIGHT EYE', 
+                                                            threshold=4.5)
+                        
+                        for face_num, face_landmarks in enumerate(face_mesh_results.multi_face_landmarks):
+                            
+                            if left_eye_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, left_eye, face_landmarks,
+                                                'LEFT EYE', repair_mask.mp_face_mesh.FACEMESH_LEFT_EYE)
+                            
+                            if right_eye_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, right_eye, face_landmarks,
+                                                'RIGHT EYE', repair_mask.mp_face_mesh.FACEMESH_RIGHT_EYE)
+                            
+                            if mouth_status[face_num] == 'OPEN':
+                                
+                                frame = repair_mask.overlay(frame, smoke_frame, face_landmarks, 
+                                                'MOUTH', repair_mask.mp_face_mesh.FACEMESH_LIPS)
+
+                    save_vid.write(frame)
+
+                    try:
+                        frame= cv2.putText(frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass
+
+
+        elif self.effects == "thug_life":
+            maskPath = 'static/media/thug_life_mask.png'
+            harcasPath = 'static/files/haarcascade_frontalface_default.xml'
+            faceCascade = cv2.CascadeClassifier(harcasPath)
+            
+            mask = Image.open(maskPath)
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = faceCascade.detectMultiScale(gray, 2.1)
+                    background = Image.fromarray(frame)
+                    for (x, y, w, h) in faces:
+                        resized_mask = mask.resize((w, h), Image.ANTIALIAS)
+                        offset = (x, y)
+                        background.paste(resized_mask, offset, mask=resized_mask)
+                    frame = np.asarray(background)
+
+                    save_vid.write(frame)
+
+                    try:
+                        frame= cv2.putText(frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass
+
+
+        elif self.effects == "noel_glasses":
+            maskPath = 'static/media/xmas_glasses_mask.png'
+            harcasPath = 'static/files/haarcascade_frontalface_default.xml'
+            faceCascade = cv2.CascadeClassifier(harcasPath)
+            # mask = cv2.imread(maskPath)
+            # mask = Image.fromarray(mask)
+            mask = Image.open(maskPath)
+
+            while (vid.isOpened()):
+                ret, frame = vid.read()
+                if ret:
+                    frame = cv2.flip(frame,1)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = faceCascade.detectMultiScale(gray, 2.1)
+                    background = Image.fromarray(frame)
+                    for (x, y, w, h) in faces:
+                        resized_mask = mask.resize((w+30, h+30), Image.ANTIALIAS)
+                        offset = (x, y)
+                        background.paste(resized_mask, offset, mask=resized_mask)
+                    frame = np.asarray(background)
+
+                    save_vid.write(frame)
+
+                    try:
+                        frame= cv2.putText(frame," Rec", (5,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255),3)
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    except Exception as e:
+                        pass
+
+
         else:
             while (vid.isOpened()):
                 ret, frame = vid.read()
-
                 if ret:
                     save_vid.write(frame)
 

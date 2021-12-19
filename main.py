@@ -55,16 +55,21 @@ def main():
     args = parse_arguments()
     # change effect name to this list to use effects:
     ## "background_removal": change background to specific image from 'import_pic_path', use GPU to speed up recording
+    
     ## "zoom_in"
     ## "sepia"
     ## "vintage"
     ## "time_warp_scan_horizontal"
     ## "time_warp_scan_vertical"
     ## "face_recognition"
+
     ## "pig_nose"
+    ## "cat_nose"
     ## "stacked_image"
     ## "eye_and_mouth"
     ## "thug_life"
+    ## "noel_glasses"
+
     effect_name = args.effect_name
     record_directory_name = args.output_dir
     record_name = args.output_video_name

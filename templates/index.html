@@ -75,11 +75,16 @@
                     <select name="effect" class="form-select">
                       <option selected>Choose filter</option>
                       <option value="sepia_effect">Sepia</option>
+                      <option value="vintage_effect">Vintage</option>
+                      <option value="eye_and_mouth_effect">Eye and mouth</option>
+                      <option value="thug_life_effect">Thug life</option>
+                      <option value="noel_glasses_effect">Noel glasses</option>
+                      <option value="pig_nose_effect">Pig's nose</option>
+                      <option value="cat_nose_effect">Cat's nose</option>
                     </select>
                 </div>           
                 <div class="col p-3 ">
                   <button class="btn btn-primary btn-lg" type="submit" style="width: 100px;" > Choose </button>
-                  <button class="btn btn-light "type="submit" style="margin-left: 10px; background-color: lightblue;" value="Demo" name="demo"> Demo </button>
                 </div>
               </div>
             </form>
@@ -96,7 +101,7 @@
                 </span>
               </div>
             </div>
-          </div>
+          </div> 
           <div class="col-3 p-3 " style=" width: 70%;">
             <form method="post" action="{{ url_for('tasks') }}" >
               <div class="row">
@@ -107,7 +112,8 @@
                       <option value="time_warp_scan_vertical">Time Warp Vertical</option>
                       <option value="time_warp_scan_horizontal">Time Warp Horiizontal</option>
                       <option value="face_recognition">Face detection</option>
-                      <option value="vintage_effect">Vintage</option>
+                      <option value="stacked_image_effect">Stack image</option>
+                      
                     </select>
                 </div>           
                 <div class="col p-3 ">

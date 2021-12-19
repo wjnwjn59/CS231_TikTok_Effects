@@ -14,6 +14,12 @@ dict_effect = {
     "time_warp_vertical":0,
     "face_recognition":0,
     "vintage_ef":0,
+    "pig_nose_ef":0,
+    "cat_nose_ef":0,
+    "stacked_image_ef":0,
+    "eye_and_mouth_ef":0,
+    "thug_life_ef":0,
+    "noel_glasses_ef":0,
 }
 
 convert_name = {
@@ -22,11 +28,17 @@ convert_name = {
     "time_warp_horizontal": "Time warp horizontal",
     "time_warp_vertical":"Time warp vertical",
     "face_recognition":"Face recognition",
-    "vintage_ef": "Vintage"
+    "vintage_ef": "Vintage",
+
+    "pig_nose_ef": "Pig's nose",
+    "cat_nose_ef":"Cat's nose",
+    "stacked_image_ef":"Stack image",
+    "eye_and_mouth_ef":"Eye and mouth",
+    "thug_life_ef": "Thug life",
+    "noel_glasses_ef":"Noel glasses",
 }
 
 choose =0
-demo =0
 rec=0
 
 
@@ -47,7 +59,7 @@ def name_effect_choosed(dic):
       if value==1:
           return convert_name[key]
 
-
+ 
 def gen_frames():  
     camera = cv2.VideoCapture(0)
     global out, capture,rec_frame
@@ -55,10 +67,7 @@ def gen_frames():
     while True:
         success, frame = camera.read() 
         count_frame +=1
-        if success:
-            if demo:
-                if dict_effect["sepia_ef"]:
-                    frame=effects.sepia_effect(frame)               
+        if success:                    
             try:
                 ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
                 frame = buffer.tobytes()
@@ -66,7 +75,7 @@ def gen_frames():
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             except:
                 pass         
-   
+
 def record_frame():
     name_effect = ""
     if dict_effect["sepia_ef"]:
@@ -81,6 +90,25 @@ def record_frame():
         name_effect = "face_recognition"
     elif dict_effect["vintage_ef"]:
         name_effect = "vintage"
+    
+    elif dict_effect["pig_nose_ef"]:
+        name_effect = "pig_nose"
+
+    elif dict_effect["cat_nose_ef"]:
+        name_effect = "cat_nose"
+
+    elif dict_effect["stacked_image_ef"]:
+        name_effect = "stacked_image"
+
+    elif dict_effect["eye_and_mouth_ef"]:
+        name_effect = "eye_and_mouth"
+
+    elif dict_effect["thug_life_ef"]:
+        name_effect = "thug_life"
+
+    elif dict_effect["noel_glasses_ef"]:
+        name_effect = "noel_glasses"
+
     recorder = WebRecordVideo(effects=name_effect)
     return recorder
 
@@ -122,10 +150,24 @@ def tasks():
         elif  request.form.get('effect') == 'vintage_effect':     
             change_values_dict(dict_effect,"vintage_ef")   
 
+        elif  request.form.get('effect') == 'pig_nose_effect':     
+            change_values_dict(dict_effect,"pig_nose_ef")   
+        
+        elif  request.form.get('effect') == 'cat_nose_effect':     
+            change_values_dict(dict_effect,"cat_nose_ef")  
 
-        elif  request.form.get('demo') == 'Demo':
-            global demo
-            demo = not demo
+        elif  request.form.get('effect') == 'stacked_image_effect':     
+            change_values_dict(dict_effect,"stacked_image_ef")   
+
+        elif  request.form.get('effect') == 'eye_and_mouth_effect':     
+            change_values_dict(dict_effect,"eye_and_mouth_ef")   
+
+        elif  request.form.get('effect') == 'thug_life_effect':     
+            change_values_dict(dict_effect,"thug_life_ef") 
+
+        elif  request.form.get('effect') == 'noel_glasses_effect':     
+            change_values_dict(dict_effect,"noel_glasses_ef")   
+ 
         elif  request.form.get('rec') == 'Rec':
             global rec
             rec = not rec
