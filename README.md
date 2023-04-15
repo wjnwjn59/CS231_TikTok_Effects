@@ -24,7 +24,7 @@ In this project, we will use Python and Python libraries to implement TikTok vid
     <th>Dương Nguyễn Thuận</th>
     <th>19522312</th>
     <th>19522312@gm.uit.edu.vn</th>
-    <th>https://github.com/DNThuan</th>
+    <th>https://github.com/ThuanNaN</th>
   </tr>
    <tr>
     <th>3</th>
