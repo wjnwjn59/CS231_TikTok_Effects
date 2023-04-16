@@ -38,13 +38,18 @@ You can check detail information of implemented effects in the attached slide.
 </table>
 
 # Instruction
+## Step 0 (Optional): Install conda
+Using conda environment is recommended. You can download conda following this instruction: [link](https://conda.io/projects/conda/en/stable/user-guide/install/download.html). When conda is installed, create conda environment and activate it using the below commands:
+```
+$ conda create -n tiktok_effects_env python=3.9 -y
+```
 ## Step 1: Install required libraries  
 ```
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 ## Step 2: Download pretrained model
 * For pixellib library: [link](https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.1/xception_pascalvoc.pb). This model should be placed in models/pixellib_models directory.
 ## Step 3: Run the demo
 ```
-python app.py
+$ python app.py
 ```
