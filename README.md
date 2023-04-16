@@ -1,7 +1,10 @@
-# CS231 final project: Tiktok effects
+# CS231 Final Project: Tiktok Effects
 ![Python](https://img.shields.io/badge/python-3.9-blue)
+[slides](https://docs.google.com/presentation/d/1pFMhJcswig12k3I7FHy-tDi5ue0Yb3gKHstsSjXmisg/edit?usp=sharing)
 # Description
-In this project, we will use Python and Python libraries to implement TikTok video effects. Intuitively, we also build a simple web demo that users could record a video and be able to apply effects just like recording a TikTok video.
+In this project, we use Python to implement some TikTok video effects. Intuitively, we also build a simple web demo that users could record a video and be able to apply effects just like recording a TikTok video.
+
+You can check detail information of implemented effects in the attached slide.
 # Members
 
 <table>
@@ -14,21 +17,21 @@ In this project, we will use Python and Python libraries to implement TikTok vid
   </tr>
   <tr>
     <th>1</th>
-    <th>Dương Đình Thắng</th>
+    <th>Dinh Thang-Duong</th>
     <th>19522195</th>
     <th>19522195@gm.uit.edu.vn</th>
-    <th>https://github.com/ThangDuong59</th>
+    <th>https://github.com/wjnwjn59</th>
   </tr>
   <tr>
     <th>2</th>
-    <th>Dương Nguyễn Thuận</th>
+    <th>Nguyen Thuan-Duong</th>
     <th>19522312</th>
     <th>19522312@gm.uit.edu.vn</th>
     <th>https://github.com/ThuanNaN</th>
   </tr>
    <tr>
     <th>3</th>
-    <th>Trương Đình Đức Trí</th>
+    <th>Dinh Duc Tri-Truong</th>
     <th>19522395</th>
     <th>19522395@gm.uit.edu.vn</th>
     <th>https://github.com/TruongDinhDTri</th>
