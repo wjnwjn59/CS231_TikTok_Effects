@@ -1,6 +1,7 @@
 # CS231 Final Project: Tiktok Effects
 ![Python](https://img.shields.io/badge/python-3.9-blue)
-[slides](https://docs.google.com/presentation/d/1pFMhJcswig12k3I7FHy-tDi5ue0Yb3gKHstsSjXmisg/edit?usp=sharing)
+
+[slide](https://docs.google.com/presentation/d/1pFMhJcswig12k3I7FHy-tDi5ue0Yb3gKHstsSjXmisg/edit?usp=sharing)
 # Description
 In this project, we use Python to implement some TikTok video effects. Intuitively, we also build a simple web demo that users could record a video and be able to apply effects just like recording a TikTok video.
 
