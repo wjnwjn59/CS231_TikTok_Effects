@@ -39,9 +39,10 @@ You can check detail information of implemented effects in the attached slide.
 
 # Instruction
 ## Step 0 (Optional): Install conda
-Using conda environment is recommended. You can download conda following this instruction: [link](https://conda.io/projects/conda/en/stable/user-guide/install/download.html). When conda is installed, create conda environment and activate it using the below commands:
+Using conda environment is recommended. You can download conda following this instruction: [link](https://conda.io/projects/conda/en/stable/user-guide/install/download.html). When conda is installed, create a conda environment and activate it using the below commands:
 ```
 $ conda create -n tiktok_effects_env python=3.9 -y
+$ conda activate tiktok_effects_env
 ```
 ## Step 1: Install required libraries  
 ```
